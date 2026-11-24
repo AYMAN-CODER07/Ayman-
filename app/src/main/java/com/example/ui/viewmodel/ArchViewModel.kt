@@ -117,6 +117,12 @@ class ArchViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun setWebShareBaseUrl(url: String) {
+        viewModelScope.launch {
+            progressStore.setWebShareBaseUrl(url)
+        }
+    }
+
     fun selectInteractiveMode(modeIndex: Int) {
         _uiState.update { it.copy(interactiveModeIndex = modeIndex) }
     }

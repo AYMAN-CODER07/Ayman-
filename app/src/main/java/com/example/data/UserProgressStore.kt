@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.domain.model.AppLanguage
+import com.example.qr.QrCodeUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -18,7 +19,8 @@ data class UserProgressData(
     val bookmarkedTopicIds: Set<String> = emptySet(),
     val bestScoresByUnit: Map<String, Int> = emptyMap(),
     val darkThemeEnabled: Boolean = true,
-    val language: AppLanguage = AppLanguage.HINGLISH
+    val language: AppLanguage = AppLanguage.HINGLISH,
+    val webShareBaseUrl: String = QrCodeUtils.DEFAULT_WEB_SHARE_URL
 )
 
 class UserProgressStore(private val context: Context) {
@@ -29,6 +31,7 @@ class UserProgressStore(private val context: Context) {
         val DARK_THEME = booleanPreferencesKey("dark_theme_enabled")
         val HINGLISH_ENABLED = booleanPreferencesKey("hinglish_enabled")
         val APP_LANGUAGE = stringPreferencesKey("app_language")
+        val WEB_SHARE_URL = stringPreferencesKey("web_share_base_url")
         fun unitScore(unitId: String) = intPreferencesKey("best_score_$unitId")
     }
 
@@ -51,7 +54,8 @@ class UserProgressStore(private val context: Context) {
             bookmarkedTopicIds = prefs[Keys.BOOKMARKED_TOPICS] ?: emptySet(),
             bestScoresByUnit = scores,
             darkThemeEnabled = prefs[Keys.DARK_THEME] ?: true,
-            language = resolvedLang
+            language = resolvedLang,
+            webShareBaseUrl = prefs[Keys.WEB_SHARE_URL] ?: QrCodeUtils.DEFAULT_WEB_SHARE_URL
         )
     }
 
@@ -88,6 +92,13 @@ class UserProgressStore(private val context: Context) {
     suspend fun setLanguage(language: AppLanguage) {
         context.archDataStore.edit { prefs ->
             prefs[Keys.APP_LANGUAGE] = language.code
+        }
+    }
+
+    suspend fun setWebShareBaseUrl(url: String) {
+        context.archDataStore.edit { prefs ->
+            val cleaned = url.trim().ifEmpty { QrCodeUtils.DEFAULT_WEB_SHARE_URL }
+            prefs[Keys.WEB_SHARE_URL] = cleaned
         }
     }
 }

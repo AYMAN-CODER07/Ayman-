@@ -117,4 +117,21 @@ class SyllabusAnd3DEngineTest {
             }
         }
     }
+
+    @Test
+    fun `web qr url builder and standalone html companion generate valid outputs`() {
+        val url = com.example.qr.QrCodeUtils.buildWebShareUrl(
+            baseUrl = "example.com/coa/",
+            topicId = "karnaugh_map",
+            language = AppLanguage.TELUGU
+        )
+        assertTrue(url == "https://example.com/coa?topic=karnaugh_map&lang=te")
+        assertTrue(com.example.qr.QrCodeUtils.extractArchTopicIdFromUrl(url) == "karnaugh_map")
+        assertTrue(com.example.qr.QrCodeUtils.isWebUrl(url))
+
+        val html = com.example.qr.WebCompanionHtmlBuilder.buildStandaloneHtml(AppLanguage.HINGLISH)
+        assertTrue(html.contains("<!DOCTYPE html>"))
+        assertTrue(html.contains("karnaugh_map"))
+        assertTrue(html.contains("number_systems_codes"))
+    }
 }

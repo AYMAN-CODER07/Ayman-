@@ -18,8 +18,10 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.ViewInAr
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material.icons.outlined.ViewInAr
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +56,7 @@ import androidx.navigation.navArgument
 import com.example.ui.components.LanguageMenuButton
 import com.example.ui.screens.Concept3DLabScreen
 import com.example.ui.screens.HomeCurriculumScreen
+import com.example.ui.screens.QrWebScreen
 import com.example.ui.screens.QuizArenaScreen
 import com.example.ui.screens.Sandbox3DHubScreen
 import com.example.ui.theme.Arch3dCoaTheme
@@ -62,6 +65,7 @@ import com.example.ui.viewmodel.ArchViewModel
 const val ROUTE_SYLLABUS = "syllabus"
 const val ROUTE_LAB_HUB = "lab_hub"
 const val ROUTE_QUIZ = "quiz"
+const val ROUTE_QR_WEB = "qr_web"
 const val ROUTE_CONCEPT_3D = "concept_3d/{topicId}"
 
 private data class TopLevelDestination(
@@ -75,7 +79,8 @@ private data class TopLevelDestination(
 private val TopDestinations = listOf(
     TopLevelDestination(ROUTE_SYLLABUS, R.string.nav_syllabus, Icons.AutoMirrored.Filled.MenuBook, Icons.AutoMirrored.Outlined.MenuBook, "nav_syllabus"),
     TopLevelDestination(ROUTE_LAB_HUB, R.string.nav_lab_3d, Icons.Filled.ViewInAr, Icons.Outlined.ViewInAr, "nav_lab_3d"),
-    TopLevelDestination(ROUTE_QUIZ, R.string.nav_quiz, Icons.Filled.Quiz, Icons.Outlined.Quiz, "nav_quiz")
+    TopLevelDestination(ROUTE_QUIZ, R.string.nav_quiz, Icons.Filled.Quiz, Icons.Outlined.Quiz, "nav_quiz"),
+    TopLevelDestination(ROUTE_QR_WEB, R.string.nav_qr_web, Icons.Filled.QrCodeScanner, Icons.Outlined.QrCodeScanner, "nav_qr_web")
 )
 
 class MainActivity : ComponentActivity() {
@@ -105,7 +110,7 @@ private fun Arch3dAppShell(
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
-    val isTopLevelRoute = currentDestination?.route in setOf(ROUTE_SYLLABUS, ROUTE_LAB_HUB, ROUTE_QUIZ)
+    val isTopLevelRoute = currentDestination?.route in setOf(ROUTE_SYLLABUS, ROUTE_LAB_HUB, ROUTE_QUIZ, ROUTE_QR_WEB)
 
     fun navigateToConceptLab(topicId: String, startIn3D: Boolean) {
         viewModel.openTopic(topicId, startIn3D = startIn3D)
@@ -244,6 +249,14 @@ private fun Arch3dAppShell(
                                 onStartQuizUnit = viewModel::startQuiz,
                                 onSubmitOption = viewModel::submitQuizOption,
                                 onNextQuestion = viewModel::advanceQuiz
+                            )
+                        }
+
+                        composable(ROUTE_QR_WEB) {
+                            QrWebScreen(
+                                uiState = uiState,
+                                onSetWebBaseUrl = viewModel::setWebShareBaseUrl,
+                                onOpenTopicInApp = { topicId -> navigateToConceptLab(topicId, startIn3D = false) }
                             )
                         }
 
